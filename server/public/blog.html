@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Detail</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .blog-container img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blog-container">
+        <a href="index.html" class="back-link">← Back to Blogs</a>
+        <div id="blog-detail">Loading blog...</div>
+    </div>
+
+    <script>
+        // Get blog ID from URL
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        if (!id) {
+            document.getElementById("blog-detail").innerHTML = "<p>No blog selected.</p>";
+        } else {
+            fetch(`/api/blogs/${id}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Blog not found");
+                    return res.json();
+                })
+                .then(blog => {
+                    document.getElementById("blog-detail").innerHTML = `
+            <h1>${blog.title}</h1>
+            ${blog.image_path ? `<img src="${blog.image_path}" alt="${blog.title}"/>` : ""}
+            <p><em>Published on: ${new Date(blog.created_at).toLocaleDateString()}</em></p>
+            <p>${blog.content}</p>
+          `;
+                })
+                .catch(err => {
+                    document.getElementById("blog-detail").innerHTML = `<p>Error loading blog: ${err.message}</p>`;
+                });
+        }
+    </script>
+</body>
+
+</html>
